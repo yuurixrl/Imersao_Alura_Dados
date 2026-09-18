@@ -1,68 +1,207 @@
-# Imersão Alura Dados no Databricks
+# VoeBem Analytics no Databricks
 
-Este repositório reúne os artefatos do projeto de Engenharia de Dados construído no Databricks durante a imersão, com foco na organização das camadas Bronze, Silver e Gold a partir da base de voos da ANAC. O objetivo é estruturar a ingestão dos dados brutos, aplicar governança e padronização na Silver e deixar o terreno preparado para análises e agregações na Gold.
+Este repositório reúne os artefatos do projeto de engenharia de dados construído com dados públicos da ANAC durante a Imersão Alura. O fluxo cobre ingestão, modelagem em camadas, qualidade, governança e consumo analítico no Databricks.
 
-## Objetivo do projeto
+O projeto usa a arquitetura Bronze, Silver e Gold para transformar arquivos CSV de voos regulares ativos e tabelas de referência em tabelas prontas para análise. A base principal do trabalho é a tabela `voebem.gold.obt_voos`, preparada para responder perguntas de negócio sobre atrasos, pontualidade, rotas, aeroportos e companhias aéreas.
 
-* ingerir arquivos brutos de voos e tabelas de referência;
-* organizar os dados em uma arquitetura por camadas;
-* transformar a Silver em um espelho governado da Bronze, sem perder grão nem linhas;
-* documentar regras de tipagem, padronização e colunas derivadas;
-* preparar a base para análises posteriores sobre atrasos, aeroportos e companhias.
+## O que o projeto entrega
 
-## Estrutura atual
+* ingestão dos arquivos VRA da ANAC para a camada Bronze;
+* carga das tabelas de referência de aeródromos, empresas e códigos operacionais;
+* transformação da Bronze em uma Silver governada, tipada e documentada, sem perder grão nem linhas;
+* pipeline de qualidade para auditoria e quarentena na camada Silver;
+* modelagem Gold com dimensão, fato e OBT para análise;
+* materiais auxiliares para documentação, perguntas de negócio e uso com Genie.
 
+## Arquitetura de dados
+
+### Bronze
+
+Camada de aterrissagem dos dados brutos, com mínima intervenção.
+
+Tabelas principais:
+
+* `voebem.bronze.vra`
+* `voebem.bronze.aerodromos`
+* `voebem.bronze.empresas_nacionais`
+* `voebem.bronze.empresas_estrangeiras`
+* `voebem.bronze.codigos_operacao`
+
+### Silver
+
+Camada governada que preserva a granularidade da Bronze, aplica tipagem, padronização e colunas derivadas, mas evita regras de negócio que filtrem ou agreguem a base.
+
+Tabelas principais:
+
+* `voebem.silver.vra`
+* `voebem.silver.aerodromos`
+* `voebem.silver.empresas`
+* `voebem.silver.codigos_operacao`
+
+### Gold
+
+Camada de consumo analítico.
+
+Tabelas principais:
+
+* `voebem.gold.dim_aeroporto`
+* `voebem.gold.fato_voos`
+* `voebem.gold.obt_voos`
+
+## Estrutura do repositório
+
+* `dados/`
+  * arquivos CSV usados no projeto, separados em `vra/` e `referencias/`
+* `docs/`
+  * documentação de apoio, guia inicial, fontes, perguntas de negócio e testes de aceitação
+* `genie/`
+  * instruções e configuração do espaço Genie
 * `notebooks/`
-  * notebooks do projeto com ingestão, consultas exploratórias, referências e regras de governança
-* `dados/vra/`
-  * cópia dos arquivos CSV de VRA trazidos de `/Volumes/voebem/bronze/arquivos/vra`
-* `dados/referencias/`
-  * cópia dos arquivos CSV de referência trazidos de `/Volumes/voebem/bronze/arquivos/referencias`
+  * notebooks Databricks de ingestão, validação, governança e resultados
+* `pipelines/qualidade/`
+  * arquivos SQL usados no pipeline de qualidade
+* `scripts/`
+  * utilitários para download de dados, montagem do Genie e execução via CLI
+* `sql/`
+  * preparação do ambiente, consultas de qualidade, modelagem Gold e gabaritos das perguntas
 
-As cópias em `dados/` foram feitas sem alterar os diretórios originais na Volume, para evitar qualquer impacto no projeto principal.
+## Como rodar o projeto no Databricks
 
-## O que foi trabalhado até agora
+### 1. Pré-requisitos
 
-### 1. Organização do repositório
+Você precisa de um workspace Databricks com:
 
-* os notebooks do projeto foram agrupados na pasta `notebooks/`;
-* a pasta `dados/` foi criada para armazenar cópias locais dos arquivos usados no projeto;
-* foi adicionada a separação entre `dados/vra/` e `dados/referencias/`.
+* permissão para criar catálogo, schemas, volume e tabelas;
+* compute serverless ou outro compute compatível com SQL e Python;
+* acesso para importar notebooks e, se quiser usar os scripts, Databricks CLI configurada.
 
-### 2. Camada Bronze
+O projeto assume o catálogo `voebem` e o volume `/Volumes/voebem/bronze/arquivos`.
 
-* ingestão e exploração inicial dos arquivos VRA;
-* análise dos dados brutos antes de qualquer transformação;
-* uso de arquivos auxiliares de referência para enriquecer o entendimento dos dados.
+### 2. Preparar o ambiente
 
-### 3. Camada Silver
+Execute o arquivo `sql/00_preparar_ambiente.sql` em um notebook SQL ou editor SQL no Databricks. Ele cria:
 
-* definição da regra central de que a Silver deve espelhar a Bronze com governança aplicada;
-* manutenção do mesmo grão e da mesma contagem de linhas da tabela original;
-* transformação de colunas de horário de `STRING` para `TIMESTAMP`;
-* conversão de valores sentinela como `'null'` para `NULL` real;
-* padronização de `codigo_justificativa`, convertendo `N/A` para `NULL`;
-* criação de colunas derivadas como datas, horas, `atraso_partida_min`, `atraso_chegada_min` e `minutos_recuperados`.
+* catálogo `voebem`
+* schemas `bronze`, `silver` e `gold`
+* volume `voebem.bronze.arquivos`
 
-### 4. Comparação Bronze vs Silver
+### 3. Disponibilizar os arquivos CSV
 
-Foi adicionada uma análise comparativa no notebook da Silver para validar as mudanças aplicadas entre `voebem.bronze.vra` e `voebem.silver.vra`, cobrindo:
+Há dois caminhos possíveis:
 
-* estrutura das tabelas;
-* tipos das colunas;
-* amostra de registros antes e depois;
-* identificação objetiva de campos tratados e padronizados.
+* usar os arquivos já versionados em `dados/vra` e `dados/referencias`;
+* baixar novamente os arquivos da ANAC com `scripts/baixar_anac.py`.
 
-Entre os principais resultados observados:
+Depois, envie os CSVs para o volume do Databricks nestes caminhos:
 
-* Bronze e Silver mantêm 1.014.705 linhas;
-* quatro colunas mudaram de `STRING` para `TIMESTAMP`;
-* novas colunas analíticas e de rastreabilidade foram adicionadas na Silver;
-* os tratamentos aplicados foram mensurados diretamente sobre os dados.
+* `/Volumes/voebem/bronze/arquivos/vra/`
+* `/Volumes/voebem/bronze/arquivos/referencias/`
 
-## Próximos passos sugeridos
+O notebook `03_bronze_vra` espera os CSVs mensais em `/Volumes/voebem/bronze/arquivos/vra/*.csv`.
 
-* evoluir a camada Gold com métricas analíticas por companhia, rota e aeroporto;
-* documentar regras de negócio que devem ficar fora da Silver e entrar apenas na Gold;
-* adicionar validações automatizadas de qualidade entre as camadas;
-* complementar este repositório com instruções de execução e dependências, se necessário.
+### 4. Executar os notebooks da camada Bronze e Silver
+
+Importe os notebooks da pasta `notebooks/` para o workspace e execute nesta ordem:
+
+1. `03_bronze_vra`
+2. `04_bronze_referencias`
+3. `bronze_consultas`
+4. `05_silver_espelho`
+
+O que cada etapa faz:
+
+* `03_bronze_vra`: lê os 12 CSVs mensais do VRA e cria `voebem.bronze.vra`;
+* `04_bronze_referencias`: carrega aeródromos, empresas e códigos de apoio;
+* `bronze_consultas`: valida contagens, colunas e amostras da Bronze;
+* `05_silver_espelho`: aplica tipagem, padronização e colunas derivadas na Silver.
+
+### 5. Executar o pipeline de qualidade
+
+Os arquivos em `pipelines/qualidade/` devem ser usados em um pipeline SQL no Databricks. Adicione ao mesmo pipeline:
+
+* `01_vra_marcado.sql`
+* `02_vra_auditado.sql`
+* `03_vra_quarentena.sql`
+
+Esse pipeline mede regras de qualidade, publica auditoria e isola registros problemáticos para investigação sem alterar a proposta central da Silver.
+
+### 6. Construir a camada Gold
+
+Execute os arquivos SQL abaixo nesta ordem:
+
+1. `sql/gold/01_dim_aeroporto.sql`
+2. `sql/gold/02_fato_voos.sql`
+3. `sql/gold/03_obt_voos.sql`
+
+Em seguida, execute os notebooks:
+
+1. `09_governanca_gold`
+2. `10_resultados_gold`
+
+Essas etapas criam e documentam as tabelas analíticas finais e registram metadados úteis para consumo humano e por IA.
+
+### 7. Validar o resultado
+
+Ao final da execução, valide pelo menos:
+
+* existência das tabelas Bronze, Silver e Gold;
+* contagem equivalente entre `voebem.bronze.vra` e `voebem.silver.vra`;
+* existência da OBT `voebem.gold.obt_voos` com dados consultáveis;
+* documentação e governança aplicadas às tabelas Gold.
+
+Nos resultados já observados no projeto:
+
+* `voebem.bronze.vra` foi carregada com 1.014.705 linhas;
+* a Silver preservou a mesma contagem;
+* a Gold foi organizada em dimensão, fato e OBT para perguntas de negócio.
+
+## Como rodar os scripts auxiliares
+
+Os scripts da pasta `scripts/` são opcionais, mas ajudam na operação do projeto.
+
+* `baixar_anac.py`
+  * baixa os arquivos mais recentes da ANAC para `dados/` e atualiza `docs/fontes.md`
+* `montar_genie_space.py`
+  * gera `genie/genie_space.json` a partir das perguntas e gabaritos SQL
+* `perguntar_genie.py`
+  * envia perguntas para um espaço Genie já configurado
+* `rodar_notebook.sh`
+  * dispara a execução de um notebook do workspace como execução one-time
+* `rodar_pipeline.sh`
+  * inicia uma atualização de pipeline e acompanha o status
+
+Para usar os scripts que dependem da CLI, configure antes:
+
+* `DATABRICKS_CONFIG_PROFILE`
+* `DATABRICKS_WORKSPACE_PATH` quando aplicável
+* `GENIE_SPACE_ID` no caso do script do Genie
+
+## Perguntas de negócio cobertas
+
+A pasta `sql/gabarito/` traz consultas para responder perguntas como:
+
+* quais aeroportos concentram os maiores atrasos de partida;
+* como o atraso evolui ao longo do dia;
+* qual companhia apresenta melhor pontualidade e menor taxa de cancelamento;
+* se voos internacionais atrasam mais do que domésticos;
+* quanto atraso é recuperado em voo.
+
+## Documentação complementar
+
+Consulte também:
+
+* `docs/comece-aqui.md` para um passo a passo detalhado;
+* `docs/fontes.md` para a origem dos arquivos e armadilhas das fontes da ANAC;
+* `docs/perguntas-de-negocio.md` para o contexto analítico;
+* `docs/teste-aceitacao.md` para validar a entrega.
+
+## Resumo do fluxo
+
+1. preparar catálogo, schemas e volume;
+2. enviar ou baixar os CSVs da ANAC;
+3. executar notebooks Bronze e Silver;
+4. rodar o pipeline de qualidade;
+5. construir a Gold;
+6. validar as tabelas finais e explorar as consultas de negócio.
+
+Com isso, o repositório fica pronto para estudo, demonstração e evolução do projeto dentro do Databricks.

@@ -1,0 +1,1904 @@
+{
+  "datasets": [
+    {
+      "name": "25a11c59",
+      "displayName": "vra_quarentena",
+      "config": {
+        "version": "1.1",
+        "source": "voebem.silver.vra_quarentena",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "obt_voos",
+      "displayName": "Voos - Atrasos e Pontualidade",
+      "config": {
+        "source": "voebem.gold.obt_voos",
+        "measures": [
+          {
+            "name": "total_voos",
+            "expr": "COUNT(*)",
+            "displayName": "Total de Voos"
+          },
+          {
+            "name": "voos_atrasados_partida",
+            "expr": "SUM(CASE WHEN partida_pontual = false THEN 1 ELSE 0 END)",
+            "displayName": "Voos Atrasados na Partida"
+          },
+          {
+            "name": "voos_atrasados_chegada",
+            "expr": "SUM(CASE WHEN chegada_pontual = false THEN 1 ELSE 0 END)",
+            "displayName": "Voos Atrasados na Chegada"
+          },
+          {
+            "name": "voos_cancelados",
+            "expr": "SUM(CASE WHEN voo_cancelado THEN 1 ELSE 0 END)",
+            "displayName": "Voos Cancelados"
+          },
+          {
+            "name": "voos_realizados",
+            "expr": "SUM(CASE WHEN voo_realizado THEN 1 ELSE 0 END)",
+            "displayName": "Voos Realizados"
+          },
+          {
+            "name": "voos_pontuais_chegada",
+            "expr": "SUM(CASE WHEN chegada_pontual = true THEN 1 ELSE 0 END)",
+            "displayName": "Voos Pontuais na Chegada"
+          },
+          {
+            "name": "atraso_medio_partida",
+            "expr": "AVG(atraso_partida_min)",
+            "displayName": "Atraso Médio na Partida (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          },
+          {
+            "name": "atraso_medio_chegada",
+            "expr": "AVG(atraso_chegada_min)",
+            "displayName": "Atraso Médio na Chegada (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          },
+          {
+            "name": "recuperacao_media",
+            "expr": "AVG(minutos_recuperados)",
+            "displayName": "Recuperação Média (min)",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          },
+          {
+            "name": "pct_atraso_partida",
+            "expr": "SUM(CASE WHEN partida_pontual = false THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN partida_pontual IS NOT NULL THEN 1 ELSE 0 END), 0)",
+            "displayName": "Taxa de Atraso na Partida",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          },
+          {
+            "name": "pct_atraso_chegada",
+            "expr": "SUM(CASE WHEN chegada_pontual = false THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN chegada_pontual IS NOT NULL THEN 1 ELSE 0 END), 0)",
+            "displayName": "Taxa de Atraso na Chegada",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          },
+          {
+            "name": "pct_chegada_pontual",
+            "expr": "SUM(CASE WHEN chegada_pontual = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN chegada_pontual IS NOT NULL THEN 1 ELSE 0 END), 0)",
+            "displayName": "Taxa de Chegada Pontual",
+            "format": {
+              "type": "percentage",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 1.0
+              }
+            }
+          }
+        ],
+        "version": "1.1",
+        "comment": "Análise de atrasos de voos no Brasil (ANAC/VRA) - período ago/2025 a jul/2026",
+        "dimensions": [
+          {
+            "name": "nome_companhia",
+            "expr": "nome_companhia",
+            "displayName": "Companhia",
+            "comment": "Razão social da companhia aérea"
+          },
+          {
+            "name": "icao_origem",
+            "expr": "icao_origem",
+            "displayName": "ICAO Origem"
+          },
+          {
+            "name": "nome_aeroporto_origem",
+            "expr": "nome_aeroporto_origem",
+            "displayName": "Aeroporto de Origem"
+          },
+          {
+            "name": "municipio_origem",
+            "expr": "municipio_origem",
+            "displayName": "Município de Origem"
+          },
+          {
+            "name": "uf_origem",
+            "expr": "uf_origem",
+            "displayName": "UF de Origem"
+          },
+          {
+            "name": "icao_destino",
+            "expr": "icao_destino",
+            "displayName": "ICAO Destino"
+          },
+          {
+            "name": "nome_aeroporto_destino",
+            "expr": "nome_aeroporto_destino",
+            "displayName": "Aeroporto de Destino"
+          },
+          {
+            "name": "rota_icao",
+            "expr": "rota_icao",
+            "displayName": "Rota (ICAO)"
+          },
+          {
+            "name": "rota_municipios",
+            "expr": "rota_municipios",
+            "displayName": "Rota"
+          },
+          {
+            "name": "hora_partida_prevista",
+            "expr": "hora_partida_prevista",
+            "displayName": "Hora da Partida",
+            "comment": "Hora cheia programada da partida, de 0 a 23"
+          },
+          {
+            "name": "dia_semana",
+            "expr": "dia_semana",
+            "displayName": "Dia da Semana"
+          },
+          {
+            "name": "mes_referencia",
+            "expr": "mes_referencia",
+            "displayName": "Mês de Referência",
+            "format": {
+              "type": "date",
+              "dateFormat": "locale_short_month"
+            }
+          },
+          {
+            "name": "escopo_voo",
+            "expr": "escopo_voo",
+            "displayName": "Escopo do Voo"
+          },
+          {
+            "name": "descricao_di",
+            "expr": "descricao_di",
+            "displayName": "Tipo de Etapa"
+          },
+          {
+            "name": "descricao_tipo_linha",
+            "expr": "descricao_tipo_linha",
+            "displayName": "Tipo de Linha"
+          },
+          {
+            "name": "situacao_voo",
+            "expr": "situacao_voo",
+            "displayName": "Situação do Voo"
+          },
+          {
+            "name": "faixa_atraso_partida",
+            "expr": "CASE\n  WHEN atraso_partida_min IS NULL THEN 'Sem info/cancelado'\n  WHEN atraso_partida_min <= 0 THEN 'Pontual/adiantado'\n  WHEN atraso_partida_min BETWEEN 1 AND 15 THEN 'Atraso leve (1-15 min)'\n  WHEN atraso_partida_min BETWEEN 16 AND 60 THEN 'Atraso moderado (16-60 min)'\n  WHEN atraso_partida_min BETWEEN 61 AND 120 THEN 'Atraso grave (61-120 min)'\n  ELSE 'Atraso severo (>120 min)'\nEND",
+            "displayName": "Faixa de Atraso na Partida"
+          }
+        ]
+      }
+    },
+    {
+      "name": "silver_quality",
+      "displayName": "Silver - Qualidade de Dados",
+      "queryLines": [
+        "SELECT\n",
+        "  'Dados em Quarentena' AS status,\n",
+        "  COUNT(*) AS total\n",
+        "FROM\n",
+        "  voebem.silver.vra_quarentena\n",
+        "UNION ALL\n",
+        "SELECT\n",
+        "  'Dados Válidos' AS status,\n",
+        "  COUNT(*) AS total\n",
+        "FROM\n",
+        "  voebem.silver.vra"
+      ]
+    },
+    {
+      "name": "bronze_vra",
+      "displayName": "Bronze - Ingestão VRA",
+      "config": {
+        "version": "1.1",
+        "source": "voebem.bronze.vra",
+        "dimensions": [
+          {
+            "name": "arquivo_origem",
+            "expr": "_arquivo_origem",
+            "displayName": "Arquivo CSV"
+          }
+        ],
+        "measures": [
+          {
+            "name": "total_registros",
+            "expr": "COUNT(*)",
+            "displayName": "Registros Ingeridos"
+          }
+        ]
+      }
+    },
+    {
+      "name": "gold_top10",
+      "displayName": "Gold - Top 10 Companhias",
+      "queryLines": [
+        "SELECT\n",
+        "  nome_companhia,\n",
+        "  COUNT(*) AS total_voos,\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN partida_pontual = false THEN 1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  ) AS voos_atrasados_partida,\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN voo_cancelado THEN 1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  ) AS voos_cancelados,\n",
+        "  AVG(atraso_partida_min) AS atraso_medio_partida,\n",
+        "  SUM(\n",
+        "    CASE\n",
+        "      WHEN partida_pontual = false THEN 1\n",
+        "      ELSE 0\n",
+        "    END\n",
+        "  )\n",
+        "    / NULLIF(\n",
+        "      SUM(\n",
+        "        CASE\n",
+        "          WHEN partida_pontual IS NOT NULL THEN 1\n",
+        "          ELSE 0\n",
+        "        END\n",
+        "      ),\n",
+        "      0\n",
+        "    ) AS pct_atraso_partida\n",
+        "FROM\n",
+        "  voebem.gold.obt_voos\n",
+        "GROUP BY\n",
+        "  nome_companhia\n",
+        "ORDER BY\n",
+        "  total_voos DESC\n",
+        "LIMIT 10"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "bbb2ed64",
+      "displayName": "Atrasos por Companhia",
+      "layout": [
+        {
+          "widget": {
+            "name": "comp_atrasos_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "nome_companhia",
+                      "expression": "`nome_companhia`"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 15 Companhias por Atrasos na Partida"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "nome_companhia",
+                  "displayName": "nome_companhia",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(voos_atrasados_partida)",
+                  "displayName": "voos_atrasados_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "nome_companhia",
+                  "displayName": "nome_companhia",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "comp_taxa_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "nome_companhia",
+                      "expression": "`nome_companhia`"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 15 Companhias por Taxa de Atraso"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "nome_companhia",
+                  "displayName": "nome_companhia",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(pct_atraso_partida)",
+                  "displayName": "pct_atraso_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "nome_companhia",
+                  "displayName": "nome_companhia",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "comp_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "nome_companhia",
+                      "expression": "`nome_companhia`"
+                    },
+                    {
+                      "name": "measure(total_voos)",
+                      "expression": "MEASURE(`total_voos`)"
+                    },
+                    {
+                      "name": "measure(voos_cancelados)",
+                      "expression": "MEASURE(`voos_cancelados`)"
+                    },
+                    {
+                      "name": "measure(voos_realizados)",
+                      "expression": "MEASURE(`voos_realizados`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_chegada)",
+                      "expression": "MEASURE(`voos_atrasados_chegada`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_partida)",
+                      "expression": "MEASURE(`atraso_medio_partida`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_chegada)",
+                      "expression": "MEASURE(`atraso_medio_chegada`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Métricas por Companhia"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "nome_companhia"
+                  },
+                  {
+                    "fieldName": "measure(total_voos)"
+                  },
+                  {
+                    "fieldName": "measure(voos_cancelados)"
+                  },
+                  {
+                    "fieldName": "measure(voos_realizados)"
+                  },
+                  {
+                    "fieldName": "measure(voos_atrasados_partida)"
+                  },
+                  {
+                    "fieldName": "measure(voos_atrasados_chegada)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_partida)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_chegada)"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 12,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "aeroporto",
+      "displayName": "Atrasos por Aeroporto",
+      "layout": [
+        {
+          "widget": {
+            "name": "aero_atrasos_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "nome_aeroporto_origem",
+                      "expression": "`nome_aeroporto_origem`"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Aeroportos por Atrasos na Partida"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "nome_aeroporto_origem",
+                  "displayName": "nome_aeroporto_origem",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(voos_atrasados_partida)",
+                  "displayName": "voos_atrasados_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "nome_aeroporto_origem",
+                  "displayName": "nome_aeroporto_origem",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "aero_taxa_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "nome_aeroporto_origem",
+                      "expression": "`nome_aeroporto_origem`"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Aeroportos por Taxa de Atraso"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "nome_aeroporto_origem",
+                  "displayName": "nome_aeroporto_origem",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(pct_atraso_partida)",
+                  "displayName": "pct_atraso_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "nome_aeroporto_origem",
+                  "displayName": "nome_aeroporto_origem",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "aero_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "icao_origem",
+                      "expression": "`icao_origem`"
+                    },
+                    {
+                      "name": "nome_aeroporto_origem",
+                      "expression": "`nome_aeroporto_origem`"
+                    },
+                    {
+                      "name": "municipio_origem",
+                      "expression": "`municipio_origem`"
+                    },
+                    {
+                      "name": "uf_origem",
+                      "expression": "`uf_origem`"
+                    },
+                    {
+                      "name": "measure(total_voos)",
+                      "expression": "MEASURE(`total_voos`)"
+                    },
+                    {
+                      "name": "measure(voos_realizados)",
+                      "expression": "MEASURE(`voos_realizados`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_partida)",
+                      "expression": "MEASURE(`atraso_medio_partida`)"
+                    },
+                    {
+                      "name": "measure(voos_cancelados)",
+                      "expression": "MEASURE(`voos_cancelados`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Métricas por Aeroporto"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "icao_origem"
+                  },
+                  {
+                    "fieldName": "nome_aeroporto_origem"
+                  },
+                  {
+                    "fieldName": "municipio_origem"
+                  },
+                  {
+                    "fieldName": "uf_origem"
+                  },
+                  {
+                    "fieldName": "measure(total_voos)"
+                  },
+                  {
+                    "fieldName": "measure(voos_realizados)"
+                  },
+                  {
+                    "fieldName": "measure(voos_atrasados_partida)"
+                  },
+                  {
+                    "fieldName": "measure(pct_atraso_partida)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_partida)"
+                  },
+                  {
+                    "fieldName": "measure(voos_cancelados)"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "rota",
+      "displayName": "Atrasos por Rota",
+      "layout": [
+        {
+          "widget": {
+            "name": "rota_atrasos_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "rota_municipios",
+                      "expression": "`rota_municipios`"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Rotas por Atrasos na Partida"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "rota_municipios",
+                  "displayName": "rota_municipios",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(voos_atrasados_partida)",
+                  "displayName": "voos_atrasados_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "rota_municipios",
+                  "displayName": "rota_municipios",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "rota_taxa_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "rota_municipios",
+                      "expression": "`rota_municipios`"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 20 Rotas por Taxa de Atraso"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "rota_municipios",
+                  "displayName": "rota_municipios",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(pct_atraso_partida)",
+                  "displayName": "pct_atraso_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "rota_municipios",
+                  "displayName": "rota_municipios",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "rota_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "rota_icao",
+                      "expression": "`rota_icao`"
+                    },
+                    {
+                      "name": "rota_municipios",
+                      "expression": "`rota_municipios`"
+                    },
+                    {
+                      "name": "nome_aeroporto_origem",
+                      "expression": "`nome_aeroporto_origem`"
+                    },
+                    {
+                      "name": "nome_aeroporto_destino",
+                      "expression": "`nome_aeroporto_destino`"
+                    },
+                    {
+                      "name": "measure(total_voos)",
+                      "expression": "MEASURE(`total_voos`)"
+                    },
+                    {
+                      "name": "measure(voos_realizados)",
+                      "expression": "MEASURE(`voos_realizados`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_chegada)",
+                      "expression": "MEASURE(`voos_atrasados_chegada`)"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    },
+                    {
+                      "name": "measure(pct_atraso_chegada)",
+                      "expression": "MEASURE(`pct_atraso_chegada`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_partida)",
+                      "expression": "MEASURE(`atraso_medio_partida`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_chegada)",
+                      "expression": "MEASURE(`atraso_medio_chegada`)"
+                    },
+                    {
+                      "name": "measure(voos_cancelados)",
+                      "expression": "MEASURE(`voos_cancelados`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Métricas por Rota"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "rota_icao"
+                  },
+                  {
+                    "fieldName": "rota_municipios"
+                  },
+                  {
+                    "fieldName": "nome_aeroporto_origem"
+                  },
+                  {
+                    "fieldName": "nome_aeroporto_destino"
+                  },
+                  {
+                    "fieldName": "measure(total_voos)"
+                  },
+                  {
+                    "fieldName": "measure(voos_realizados)"
+                  },
+                  {
+                    "fieldName": "measure(voos_atrasados_partida)"
+                  },
+                  {
+                    "fieldName": "measure(voos_atrasados_chegada)"
+                  },
+                  {
+                    "fieldName": "measure(pct_atraso_partida)"
+                  },
+                  {
+                    "fieldName": "measure(pct_atraso_chegada)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_partida)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_chegada)"
+                  },
+                  {
+                    "fieldName": "measure(voos_cancelados)"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "fatores",
+      "displayName": "Fatores de Atraso",
+      "layout": [
+        {
+          "widget": {
+            "name": "hora_atrasos_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "hora_partida_prevista",
+                      "expression": "`hora_partida_prevista`"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Atrasos por Hora do Dia"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "hora_partida_prevista",
+                  "displayName": "hora_partida_prevista",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(voos_atrasados_partida)",
+                  "displayName": "voos_atrasados_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "hora_partida_prevista",
+                  "displayName": "hora_partida_prevista",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "hora_taxa_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "hora_partida_prevista",
+                      "expression": "`hora_partida_prevista`"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Taxa de Atraso por Hora"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "hora_partida_prevista",
+                  "displayName": "hora_partida_prevista",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(pct_atraso_partida)",
+                  "displayName": "pct_atraso_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "hora_partida_prevista",
+                  "displayName": "hora_partida_prevista",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "dia_semana_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "dia_semana",
+                      "expression": "`dia_semana`"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Atrasos por Dia da Semana"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dia_semana",
+                  "displayName": "dia_semana",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(voos_atrasados_partida)",
+                  "displayName": "voos_atrasados_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "dia_semana",
+                  "displayName": "dia_semana",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "mes_escopo_line",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "escopo_voo",
+                      "expression": "`escopo_voo`"
+                    },
+                    {
+                      "name": "monthly(mes_referencia)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `mes_referencia`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Evolução Mensal por Escopo"
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(mes_referencia)",
+                  "displayName": "Month",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(voos_atrasados_partida)",
+                  "displayName": "voos_atrasados_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "escopo_voo",
+                  "displayName": "escopo_voo",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "escopo_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "escopo_voo",
+                      "expression": "`escopo_voo`"
+                    },
+                    {
+                      "name": "measure(atraso_medio_partida)",
+                      "expression": "MEASURE(`atraso_medio_partida`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Atraso Médio por Escopo"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "escopo_voo",
+                  "displayName": "escopo_voo",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(atraso_medio_partida)",
+                  "displayName": "atraso_medio_partida",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "escopo_voo",
+                  "displayName": "escopo_voo",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 4,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "operacao_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "descricao_di",
+                      "expression": "`descricao_di`"
+                    },
+                    {
+                      "name": "descricao_tipo_linha",
+                      "expression": "`descricao_tipo_linha`"
+                    },
+                    {
+                      "name": "measure(total_voos)",
+                      "expression": "MEASURE(`total_voos`)"
+                    },
+                    {
+                      "name": "measure(voos_atrasados_partida)",
+                      "expression": "MEASURE(`voos_atrasados_partida`)"
+                    },
+                    {
+                      "name": "measure(pct_atraso_partida)",
+                      "expression": "MEASURE(`pct_atraso_partida`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_partida)",
+                      "expression": "MEASURE(`atraso_medio_partida`)"
+                    },
+                    {
+                      "name": "measure(voos_cancelados)",
+                      "expression": "MEASURE(`voos_cancelados`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Métricas por Tipo de Operação"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "descricao_di"
+                  },
+                  {
+                    "fieldName": "descricao_tipo_linha"
+                  },
+                  {
+                    "fieldName": "measure(total_voos)"
+                  },
+                  {
+                    "fieldName": "measure(voos_atrasados_partida)"
+                  },
+                  {
+                    "fieldName": "measure(pct_atraso_partida)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_partida)"
+                  },
+                  {
+                    "fieldName": "measure(voos_cancelados)"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 14,
+            "width": 8,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "recuperacao_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "obt_voos",
+                  "fields": [
+                    {
+                      "name": "faixa_atraso_partida",
+                      "expression": "`faixa_atraso_partida`"
+                    },
+                    {
+                      "name": "measure(total_voos)",
+                      "expression": "MEASURE(`total_voos`)"
+                    },
+                    {
+                      "name": "measure(atraso_medio_chegada)",
+                      "expression": "MEASURE(`atraso_medio_chegada`)"
+                    },
+                    {
+                      "name": "measure(recuperacao_media)",
+                      "expression": "MEASURE(`recuperacao_media`)"
+                    },
+                    {
+                      "name": "measure(pct_chegada_pontual)",
+                      "expression": "MEASURE(`pct_chegada_pontual`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Recuperação por Faixa de Atraso"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "faixa_atraso_partida"
+                  },
+                  {
+                    "fieldName": "measure(total_voos)"
+                  },
+                  {
+                    "fieldName": "measure(atraso_medio_chegada)"
+                  },
+                  {
+                    "fieldName": "measure(recuperacao_media)"
+                  },
+                  {
+                    "fieldName": "measure(pct_chegada_pontual)"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 7
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "bcc4998e",
+      "displayName": "Arquitetura Medallion",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo_medallion",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Arquitetura Medallion: Bronze → Silver → Gold\n",
+                "\n",
+                "Fluxo de processamento de dados de voos (VRA/ANAC) através das camadas da arquitetura Medallion"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "bronze_ingestao",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bronze_vra",
+                  "fields": [
+                    {
+                      "name": "arquivo_origem",
+                      "expression": "`arquivo_origem`"
+                    },
+                    {
+                      "name": "measure(total_registros)",
+                      "expression": "MEASURE(`total_registros`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showDescription": true,
+                "showTitle": true,
+                "title": "Camada Bronze - Ingestão de Dados Brutos",
+                "description": {
+                  "fields": [],
+                  "value": "Volume de registros processados por arquivo CSV (12 arquivos, 213.543 registros totais)"
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "arquivo_origem",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(total_registros)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "arquivo_origem",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "silver_qualidade",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "silver_quality",
+                  "fields": [
+                    {
+                      "name": "sum(total)",
+                      "expression": "SUM(`total`)"
+                    },
+                    {
+                      "name": "status",
+                      "expression": "`status`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showDescription": true,
+                "showTitle": true,
+                "title": "Camada Silver - Validação e Qualidade",
+                "description": {
+                  "fields": [],
+                  "value": "Sistema de quarentena: 91,4% dos registros em quarentena, 8,6% dados válidos"
+                }
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(total)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "status",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "gold_tabela",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "gold_top10",
+                  "fields": [
+                    {
+                      "name": "nome_companhia",
+                      "expression": "`nome_companhia`"
+                    },
+                    {
+                      "name": "total_voos",
+                      "expression": "`total_voos`"
+                    },
+                    {
+                      "name": "voos_atrasados_partida",
+                      "expression": "`voos_atrasados_partida`"
+                    },
+                    {
+                      "name": "voos_cancelados",
+                      "expression": "`voos_cancelados`"
+                    },
+                    {
+                      "name": "atraso_medio_partida",
+                      "expression": "`atraso_medio_partida`"
+                    },
+                    {
+                      "name": "pct_atraso_partida",
+                      "expression": "`pct_atraso_partida`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showDescription": true,
+                "showTitle": true,
+                "title": {
+                  "value": "Camada Gold - Métricas Analíticas Agregadas",
+                  "fields": []
+                },
+                "description": {
+                  "fields": [],
+                  "value": "Métricas pré-calculadas das top 10 companhias: total de voos, atrasos, cancelamentos e taxas de performance"
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "nome_companhia",
+                    "displayName": "Companhia Aérea"
+                  },
+                  {
+                    "fieldName": "total_voos",
+                    "displayName": "Total Voos"
+                  },
+                  {
+                    "fieldName": "voos_atrasados_partida",
+                    "displayName": "Voos Atrasados"
+                  },
+                  {
+                    "fieldName": "voos_cancelados",
+                    "displayName": "Cancelados"
+                  },
+                  {
+                    "fieldName": "atraso_medio_partida",
+                    "displayName": "Atraso Médio (min)"
+                  },
+                  {
+                    "fieldName": "pct_atraso_partida",
+                    "displayName": "Taxa de Atraso"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "resumo_medallion",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Resumo da Arquitetura Medallion\n",
+                "\n",
+                "Estas 4 visualizações demonstram o fluxo completo de dados: **Bronze → Silver → Gold**\n",
+                "\n",
+                "- **Bronze**: Ingestão bruta de 12 arquivos CSV (213.543 registros)\n",
+                "- **Silver**: Validação e quarentena com 91,4% dos dados identificados com problemas\n",
+                "- **Gold**: Métricas agregadas prontas para análise executiva e operacional"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 17,
+            "width": 12,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "gold_combo",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "gold_top10",
+                  "fields": [
+                    {
+                      "name": "nome_companhia",
+                      "expression": "`nome_companhia`"
+                    },
+                    {
+                      "name": "total_voos",
+                      "expression": "`total_voos`"
+                    },
+                    {
+                      "name": "pct_atraso_partida",
+                      "expression": "`pct_atraso_partida`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showDescription": true,
+                "showTitle": true,
+                "title": "Camada Gold - Volume vs Taxa de Atraso",
+                "description": {
+                  "fields": [],
+                  "value": "Comparação de volume de voos (barras) vs taxa de atraso (linha) das top 10 companhias aéreas"
+                }
+              },
+              "version": 1,
+              "widgetType": "combo",
+              "encodings": {
+                "x": {
+                  "fieldName": "nome_companhia",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "total_voos",
+                        "displayName": "Total de Voos"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "pct_atraso_partida",
+                        "displayName": "Taxa de Atraso"
+                      }
+                    ],
+                    "format": {
+                      "decimalPlaces": {
+                        "places": 1,
+                        "type": "exact"
+                      },
+                      "type": "number-percent"
+                    },
+                    "scale": {
+                      "type": "quantitative"
+                    }
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
